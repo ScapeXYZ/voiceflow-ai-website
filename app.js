@@ -30,16 +30,25 @@ form.addEventListener('submit', async (event) => {
   if (!form.reportValidity()) return;
   button.disabled = true;
   form.setAttribute('aria-busy', 'true');
-  status.textContent = 'Preparing your email draft…';
+  status.textContent = 'Sending your demo request…';
+  let failureMessage = 'We could not confirm your request. Retry with the same details or use the email fallback.';
   try {
-    await new Promise(resolve => setTimeout(resolve, 250));
     const body = ['VoiceFlow AI demo request', ...['name', 'business', 'email', 'phone', 'message'].map(key => `${key}: ${String(data.get(key)).trim() || 'Not provided'}`)].join('\n\n');
     link.href = `mailto:tishola396@gmail.com?subject=${encodeURIComponent('VoiceFlow AI Demo Request')}&body=${encodeURIComponent(body)}`;
-    link.hidden = false;
-    status.textContent = 'Draft ready. Open it below, then review and send in your email app. Nothing has been sent or stored.';
+    const response = await fetch('/api/demo-request', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(Object.fromEntries(data)), signal: AbortSignal.timeout(22000)
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      if (typeof result.message === 'string') failureMessage = result.message;
+      throw new Error('Submission failed');
+    }
+    status.textContent = result.message;
   } catch {
+    link.hidden = false;
     status.classList.add('error');
-    status.textContent = 'The draft could not be prepared. Please email tishola396@gmail.com directly.';
+    status.textContent = `${failureMessage} Open the email fallback below if needed. If you already received confirmation, please do not send again.`;
   } finally {
     button.disabled = false;
     form.removeAttribute('aria-busy');

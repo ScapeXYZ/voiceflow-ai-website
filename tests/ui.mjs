@@ -15,18 +15,18 @@ try{
   await page.locator('nav').getByRole('link',{name:'Features',exact:true}).click();await page.waitForURL('**/#features');
   if(width<700)await page.getByRole('button',{name:'Menu',exact:true}).click();
   await page.locator('nav .btn').click();await page.waitForURL('**/#contact');
-  const submit=page.getByRole('button',{name:'Prepare demo request'});
+  const submit=page.getByRole('button',{name:'Send demo request'});
   await submit.click();assert.equal(await page.locator('#name').evaluate(e=>e.validity.valueMissing),true);
   await page.locator('#name').fill('   ');await page.locator('#business').fill('Example Plumbing');await page.locator('#email').fill('not-an-email');await page.locator('#message').fill('Tailored intake demo');
   assert.equal(await page.locator('#email').evaluate(e=>e.validity.typeMismatch),true);
   await page.locator('#email').fill('alex@example.com');await submit.click();assert.equal(await page.locator('#name').evaluate(e=>e.validity.customError),true);
   await page.locator('#name').fill('Alex Example');await page.locator('#phone').fill('abc');assert.equal(await page.locator('#phone').evaluate(e=>e.validity.patternMismatch),true);await page.locator('#phone').fill('(512) 555-0142');
-  await submit.click();await page.waitForFunction(()=>document.getElementById('form-status').textContent.includes('Draft ready'));
-  const href=await page.locator('#email-draft').getAttribute('href');assert.ok(href.startsWith('mailto:tishola396@gmail.com?'));assert.ok(decodeURIComponent(href).includes('Example Plumbing'));
-  assert.ok((await page.locator('#form-status').textContent()).includes('Nothing has been sent or stored'));
+  await page.route('**/api/demo-request', async route => { await new Promise(resolve=>setTimeout(resolve,150)); await route.fulfill({json:{message:'Your demo request was accepted. Thank you!'}}); });
+  await submit.click();assert.equal(await submit.isDisabled(),true);await page.waitForFunction(()=>document.getElementById('form-status').textContent.includes('accepted'));
+  assert.equal(await page.locator('#email-draft').isVisible(),false);
   await page.locator('summary').first().click();assert.equal(await page.locator('details').first().getAttribute('open'),'');
   await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`artifacts/${label}.png`,fullPage:true});await page.screenshot({path:`artifacts/${label}-hero.png`});
-  if(label==='desktop')await page.screenshot({path:'video/assets/website.jpg',type:'jpeg',quality:85});
+
   if(!process.argv.includes('--capture-only')){
    await page.locator('video').evaluate(v=>{v.muted=true;v.load();});
    await page.waitForFunction(()=>document.querySelector('video').readyState>=1);
@@ -34,14 +34,16 @@ try{
    await page.locator('video').evaluate(v=>v.play());await page.waitForFunction(()=>document.querySelector('video').currentTime>0.1);
    await page.locator('video').evaluate(v=>v.pause());
   }
-  await page.close();console.log(`${label}: navigation, validation, draft, FAQ, layout${process.argv.includes('--capture-only')?'':', video'} passed`);
+  await page.close();console.log(`${label}: navigation, validation, submission, FAQ, layout${process.argv.includes('--capture-only')?'':', video'} passed`);
  }
  assert.deepEqual(errors,[],'Browser errors');
  // Exercise the form's error recovery without any network or email delivery.
  const page=await browser.newPage();await page.goto('http://127.0.0.1:4173');
  for(const [id,value] of [['name','Alex'],['business','Example'],['email','alex@example.com'],['message','Demo']])await page.locator(`#${id}`).fill(value);
- await page.evaluate(()=>{window.encodeURIComponent=()=>{throw Error('Simulated preparation failure');};});
- await page.getByRole('button',{name:'Prepare demo request'}).click();await page.waitForFunction(()=>document.getElementById('form-status').classList.contains('error'));
- assert.equal(await page.getByRole('button',{name:'Prepare demo request'}).isEnabled(),true);await page.close();
+ await page.route('**/api/demo-request', route=>route.fulfill({status:503,json:{message:'Unavailable'}}));
+ await page.getByRole('button',{name:'Send demo request'}).click();await page.waitForFunction(()=>document.getElementById('form-status').classList.contains('error'));
+ assert.equal(await page.getByRole('button',{name:'Send demo request'}).isEnabled(),true);
+ const href=await page.locator('#email-draft').getAttribute('href');assert.ok(href.startsWith('mailto:tishola396@gmail.com?'));assert.ok(decodeURIComponent(href).includes('Example'));
+ await page.locator('#message').fill('Updated');assert.equal(await page.locator('#email-draft').isVisible(),false);await page.close();
  console.log('Error recovery passed; no browser console errors.');
 }finally{await browser.close();}

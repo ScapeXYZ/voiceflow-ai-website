@@ -10,7 +10,7 @@
     "dev": "node scripts/serve.mjs",
     "preview": "node scripts/serve.mjs --dist",
     "lint": "node scripts/lint.mjs",
-    "test": "node tests/ui.mjs",
+    "test": "node --test tests/backend.mjs && node tests/ui.mjs",
     "build": "node scripts/build.mjs",
     "video:render": "node scripts/render.mjs",
     "video:capture": "node scripts/capture.mjs"

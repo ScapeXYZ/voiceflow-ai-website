@@ -69,3 +69,10 @@ git pull --ff-only origin main
 git merge --ff-only feat/polished-demo
 git push origin main
 ```
+
+## Automatic demo form integration (2026-10-18)
+
+- Added a separate Vercel `/api/demo-request` handler; no Retell webhook or call-notification code changed.
+- `npm run lint`, `npm run build`, and `npm test` passed locally. Browser checks cover desktop/tablet/mobile, validation, submission loading/success, failure email draft, navigation, layout, and video playback. Mocked backend tests cover validation, exact origin, JSON enforcement, honeypot, shared rate limit, stable request identity, upstream/storage failures, Apps Script authentication, duplicate suppression, and ambiguous-send retry blocking.
+- Browser requests and Google/Redis responses were mocked; no credentials were supplied and no real Gmail delivery was tested. Deployment integration remains unverified.
+- Owner configuration and end-to-end verification are documented in `docs/demo-request-setup.md`. No push or deployment was performed.

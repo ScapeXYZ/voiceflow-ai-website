@@ -16,11 +16,11 @@ npm run preview
 
 Open http://127.0.0.1:4173. In a second terminal run `npm test`. Tests use that URL and work against the development or production server. `npm run dev` previews source directly. The server binds only to localhost and supports MP4 byte ranges.
 
-Tests check desktop (1440×1000), tablet (768×1024), mobile (390×844), navigation, empty/whitespace/email/phone validation, draft content, error recovery, FAQs, horizontal overflow, browser errors, video metadata, and playback. Screenshots are written to ignored `artifacts/`. Lint checks JavaScript syntax, unique HTML IDs and local anchors; it is a small project-specific check, not a full CSS/accessibility audit.
+Tests check desktop (1440×1000), tablet (768×1024), mobile (390×844), navigation, empty/whitespace/email/phone validation, submission states and email fallback, error recovery, FAQs, horizontal overflow, browser errors, video metadata, and playback. Screenshots are written to ignored `artifacts/`. Lint checks JavaScript syntax, unique HTML IDs and local anchors; it is a small project-specific check, not a full CSS/accessibility audit.
 
 ## Contact form
 
-No submission credentials or backend are present in this repository. The form validates input locally, prepares an encoded `mailto:` draft to the original contact (tishola396@gmail.com), and lets the visitor open and send it. Nothing is stored or sent by the website. An installed/configured email application is needed; a direct email address is always visible. Loading, ready, and error states explicitly describe draft preparation. Because no submission endpoint was added, there is no server-side endpoint requiring rate limiting. A future backend must add validation, spam safeguards and server-side secrets before changing this messaging.
+The form posts to a separate Vercel function at `/api/demo-request`. Server-side validation, a honeypot, shared Redis rate limits, and Apps Script receipt deduplication protect the notification flow. An email draft remains available on failure. Secrets are server-only. See [setup instructions](docs/demo-request-setup.md) and [separate Apps Script](docs/demo-request.gs) for required owner configuration and delivery limitations. No real Gmail delivery has been verified and no push or deployment is included.
 
 ## Demo video
 
@@ -57,4 +57,4 @@ git push origin main
 
 These commands assume `main` has not diverged and the existing Vercel project deploys from `main`. If either assumption fails, stop and review repository/project settings. Do not create a new Vercel project. Live phone answering, confirmed booking, dispatch, and production reliability are outside the current demonstration and have not been tested here.
 
-No website assets load from a CDN. Runtime assets are served locally; npm dependencies are development-only. Reduced-motion preferences disable smooth scrolling. Email drafts are encoded locally, and editing the form hides an obsolete draft link.
+No website assets load from a CDN. Runtime assets are served locally; npm dependencies are development-only. Reduced-motion preferences disable smooth scrolling. Fallback email drafts are encoded locally, and editing the form hides an obsolete draft link.
