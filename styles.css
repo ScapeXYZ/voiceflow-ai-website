@@ -7,3 +7,6 @@ html{scroll-behavior:smooth;scroll-padding-top:100px}header{position:sticky;top:
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 @media(min-width:701px) and (max-width:850px){.navlinks a:not(.btn){display:block}.navlinks{gap:14px;font-size:13px}.navlinks .btn{padding:12px 14px}}
 [hidden]{display:none!important}
+
+/* Keep optional video captions readable over both navy scenes and website footage. */
+video::cue{color:#fff;background-color:#07101ff2}

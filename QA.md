@@ -2,6 +2,16 @@
 
 Verified locally on 2026-10-18, branch `feat/polished-demo`. Nothing pushed or deployed.
 
+## Demo text contrast revision
+
+- Audited all seven Remotion scenes. The existing 70-second frame was readable, but the closing scene's opacity animation faded its headline and body almost entirely out by the last frame. Headlines also depended on inherited color.
+- Set explicit white headlines and light-blue body, labels, branding, and footer text. Full-opacity contrast against the brightest navy (`#193e72`) is 10.64:1 for headlines, 9.02:1 for body text, 7.46:1 for accents, and 7.27:1 for footer text. Closing copy stays at full opacity from 65 seconds through the final frame; other scene transitions and all seven scene timings are preserved.
+- Styled optional native captions white on a dark navy backing. All seven VTT cues retain their original timing, cover 0–75 seconds without gaps, and match the scene boundaries. Chromium checks passed immediately before and after every boundary (14 seeks).
+- Re-rendered MP4 and poster: H.264, 1920×1080, 30 fps, 2,250 frames, exactly 75 seconds, no audio, **1,927,217 bytes (1.93 MB / 1.84 MiB)**. Full-file FFmpeg decode passed.
+- Reviewed encoded-video screenshots at 3, 13, 24, 35, 46, 58, and 70 seconds plus the final frame. Opening, middle, and closing evidence: `artifacts/video-3s.jpg`, `artifacts/video-46s.jpg`, `artifacts/video-final-frame.jpg`. Captioned player screenshots use `artifacts/captioned-video-*s.png`; all seven scenes and the final frame were captured. Artifacts remain local and ignored by Git.
+- `npm run lint`, `npm run build`, and `npm test` passed, including a final desktop/tablet/mobile run against the rebuilt production output. No browser errors.
+- Changes committed locally only; no push or deployment authorized.
+
 ## Changed files
 
 - `index.html`, `styles.css`, `app.js`: preserve the static stack and original core content/contact; refine layout, copy, accessibility, responsive navigation, FAQ, sample email and transparent email-draft form.
@@ -12,7 +22,7 @@ Verified locally on 2026-10-18, branch `feat/polished-demo`. Nothing pushed or d
 - `tests/ui.mjs`: browser behavior and playback regression suite.
 - `package.json`, `package-lock.json`, `.gitignore`, `vercel.json`, `README.md`, `QA.md`: development dependencies, output exclusions, explicit static output configuration, and operational documentation.
 
-## Results
+## Original baseline results (before contrast revision)
 
 - `npm run lint`: passed JavaScript syntax, unique ID and local-anchor checks.
 - `npm run build`: passed; static deployment output in ignored `dist/`.
