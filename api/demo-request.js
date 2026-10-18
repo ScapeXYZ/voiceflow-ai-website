@@ -21,11 +21,18 @@ module.exports = async function handler(req, res) {
     if (fields[key].length > max || (key !== 'phone' && !fields[key]) || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(fields[key])) return reply(400, 'Please check all fields.');
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email) || /[\r\n]/.test(fields.email) || (fields.phone && !/^[+0-9() .-]{7,30}$/.test(fields.phone))) return reply(400, 'Please check your email and phone.');
+  let stage = 'configuration';
+  let httpStatus = null;
+  let redirected = false;
   try {
     if (!env.DEMO_SCRIPT_SECRET || env.DEMO_SCRIPT_SECRET.length < 32 || !/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(env.DEMO_SCRIPT_URL || '') || !/^https:\/\//.test(env.DEMO_REDIS_URL || '') || !env.DEMO_REDIS_TOKEN) throw Error('configuration');
     const redis = async command => {
+      stage = 'redis_fetch';
       const response = await fetch(env.DEMO_REDIS_URL, {method:'POST',headers:{Authorization:`Bearer ${env.DEMO_REDIS_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify(command),signal:AbortSignal.timeout(4000)});
+      httpStatus = response.status;
+      stage = 'redis_json';
       const result = await response.json();
+      stage = 'redis_response';
       if (!response.ok || result.error) throw Error('storage');
       return result.result;
     };
@@ -35,9 +42,19 @@ module.exports = async function handler(req, res) {
     if (Number(count) > 5) { res.setHeader('Retry-After','600'); return reply(429,'Too many attempts. Please wait ten minutes or email us.'); }
     // Stable content identity prevents retries (including after timeouts) from sending twice.
     const id = hash(JSON.stringify({...fields,email:fields.email.toLowerCase()}));
+    stage = 'script_fetch';
+    httpStatus = null;
     const response = await fetch(env.DEMO_SCRIPT_URL, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:env.DEMO_SCRIPT_SECRET,id,fields}),signal:AbortSignal.timeout(15000),redirect:'follow'});
+    httpStatus = response.status;
+    redirected = response.redirected === true;
+    stage = 'script_json';
     const result = await response.json();
+    stage = 'script_response';
     if (!response.ok || result.ok !== true || result.id !== id) throw Error('upstream');
     return reply(200,'Your demo request was accepted. Thank you!');
-  } catch { return reply(503,'We could not confirm your request. Retry with the same details or use the email fallback.'); }
+  } catch {
+    // Fixed labels and transport metadata only: never log errors, URLs or payloads.
+    console.warn(JSON.stringify({event:'demo_request_failed',stage,httpStatus,redirected}));
+    return reply(503,'We could not confirm your request. Retry with the same details or use the email fallback.');
+  }
 };
