@@ -1,0 +1,37 @@
+{
+  "name": "voiceflow-ai-website",
+  "version": "1.0.0",
+  "description": "VoiceFlow AI static landing page and reproducible demo video",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "preview": "node scripts/serve.mjs --dist",
+    "lint": "node scripts/lint.mjs",
+    "test": "node tests/ui.mjs",
+    "build": "node scripts/build.mjs",
+    "video:render": "node scripts/render.mjs",
+    "video:capture": "node scripts/capture.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ScapeXYZ/voiceflow-ai-website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ScapeXYZ/voiceflow-ai-website/issues"
+  },
+  "homepage": "https://github.com/ScapeXYZ/voiceflow-ai-website#readme",
+  "devDependencies": {
+    "@remotion/cli": "^4.0.535",
+    "playwright": "^1.63.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.535"
+  },
+  "private": true
+}

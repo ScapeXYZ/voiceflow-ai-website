@@ -1,0 +1,18 @@
+VoiceFlow AI — 75-second product demonstration
+No audio. All dialogue and customer information are fictional. Conversation reenactment; website footage shows the local candidate version.
+
+00:00–00:10 Every plumbing inquiry. Clearly captured.
+Missed details make follow-up harder. Meet Sarah, an AI receptionist demonstration.
+00:10–00:18 From conversation to organized information. Candidate website footage.
+00:18–00:29 Caller: My kitchen sink is leaking badly.
+Sarah: I'm sorry to hear that. If it's safe, shut off the water under the sink. May I get your contact details?
+00:29–00:41 John Smith, 125 Example Lane, Austin. Callback: (512) 555-0142.
+Preferred follow-up: Monday morning. Urgency: active kitchen sink leak reported.
+00:41–00:54 Illustrative email: John Smith; (512) 555-0142; kitchen sink leaking badly; urgent; 125 Example Lane, Austin, TX (fictional); Monday morning preferred; booking requested, not confirmed.
+00:54–01:05 Conversation → Structured details → Email notification → Human follow-up.
+Retell AI → Cloudflare Worker → Google Apps Script → Email.
+A person reviews the request and confirms next steps.
+01:05–01:15 Bring clarity to your customer intake.
+voiceflow-ai-website.vercel.app — Request a demo on the website.
+
+No live call, confirmed booking, or dispatch is shown. Live phone answering, calendar booking, and dispatch require separate integrations.

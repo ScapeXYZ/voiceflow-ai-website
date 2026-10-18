@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://voiceflow-ai-website.vercel.app/sitemap.xml

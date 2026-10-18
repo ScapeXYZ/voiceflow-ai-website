@@ -1,0 +1,12 @@
+import {bundle} from '@remotion/bundler';
+import {renderMedia,renderStill,selectComposition} from '@remotion/renderer';
+import {chromium} from 'playwright';
+import {mkdir} from 'node:fs/promises';
+const serveUrl=await bundle({entryPoint:'video/Root.jsx',publicDir:'video/assets'});
+const options={serveUrl,browserExecutable:chromium.executablePath(),chromiumOptions:{gl:'swiftshader'},timeoutInMilliseconds:120000};
+const composition=await selectComposition({...options,id:'VoiceFlow'});
+await mkdir('public/demo',{recursive:true});
+await renderStill({...options,composition,frame:90,imageFormat:'jpeg',output:'public/demo/poster.jpg'});
+let lastProgress = -1;
+await renderMedia({...options,composition,codec:'h264',muted:true,pixelFormat:'yuv420p',crf:25,x264Preset:'fast',concurrency:2,outputLocation:'public/demo/voiceflow-ai-demo.mp4',onProgress:({progress})=>{const step=Math.floor(progress*10);if(step!==lastProgress){lastProgress=step;console.log(`Rendered ${step*10}%`);}}});
+console.log('\nVideo complete');
